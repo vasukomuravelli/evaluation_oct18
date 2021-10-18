@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body{
+        width: 90vw;
+        margin: auto;
+        font-family: 'Lato', sans-serif;
+        display: grid;
+        grid-template-columns: 20% 80%;
+        gap: 15px;
+    }
+    img{
+        width: 200px;
+        height: 100px;
+        margin-left: 0px;
+        margin-top: 20px;
+    }
+    #news{
+        display: grid;
+        grid-template-columns: 40% 40% 20%;
+        vertical-align: top;
+        grid-gap: 20px;
+        /* border-bottom: 1px solid grey; */
+        cursor: pointer;
+    }
+    h5{
+        margin: -8px 0px -8px 0px;
+    }
+    #searchbar{
+        margin-top: 20px;
+        width: 200px;
+        padding: 5px;
+        font-size: 20px;
+    }
+    #output{
+        background-color: rgb(252, 252, 252);
+        margin-top: 0px;
+        width: 208px;
+        overflow-y: scroll;
+        height: 280px;
+    }
+    #output::-webkit-scrollbar{
+        display: none;
+    }
+    #title{
+        border-bottom : 1px solid grey;
+        cursor: pointer;
+        padding-bottom: 7px;
+    }
+</style>
+<body>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+    <div>
+        <input type="text" placeholder="Enter your favorites" id = "searchbar" oninput="debounce(getdata,2000)">
+        <div id="output"></div>
+    </div>
+    <div id = "container"></div>
+</body>
+</html>
+<script>
+    // 3abf5353f36c486ca5c64bfe08ae93b6
+    // https://newsapi.org/v2/top-headlines?country=us&apiKey=3abf5353f36c486ca5c64bfe08ae93b6
+
+    let container = document.getElementById("container");
+
+    let output = document.getElementById("output");
+
+    var delay;
+
+    fetch(`https://newsapi.org/v2/top-headlines?country=us&apiKey=3abf5353f36c486ca5c64bfe08ae93b6`).then((res)=>{
+        return res.json();
+    }).then((res)=>{
+        console.log(res.articles);
+        Shownews(res.articles);
+    })
+
+    function Shownews(news)
+    {
+        container.innerHTML = null;
+        news.forEach(element => {
+            let div = document.createElement('div');
+            div.setAttribute("id","news");
+            div.onclick = function(){
+                divert(element);
+            }
+            let name = document.createElement('h3');
+            name.innerText = element.title;
+            let author = document.createElement('h5');
+            author.innerText = element.author;
+            let date = document.createElement('p');
+            date.innerText = element.publishedAt.split('T').join(' ');
+            let des = document.createElement('p');
+            des.innerText = element.description;
+            let image = document.createElement('img');
+            image.src = element.urlToImage;
+            let hr = document.createElement('hr');
+            let details = document.createElement('div');
+            details.append(name,author,date);
+            div.append(details,des,image);
+            container.append(div,hr);
+        });
+    }
+    async function getdata()
+    {
+        let news = document.getElementById("searchbar").value;
+        
+        let res = await fetch(`https://newsapi.org/v2/everything?q=${news}&apiKey=3abf5353f36c486ca5c64bfe08ae93b6`);
+
+        let data = await res.json();
+
+        console.log(data.articles);
+
+        addtoOutput(data.articles);
+    }
+    function addtoOutput(results)
+    {
+        output.innerHTML = null;
+
+        results.forEach(element => {
+            
+            let title  = document.createElement('p');
+
+            title.innerText = element.title;
+
+            title.setAttribute("id", 'title');
+
+            title.onclick = function(){
+
+                searchresults(element);
+            }
+
+            output.append(title);
+        });
+    }
+
+    function debounce(func, time)
+    {
+        if(delay)
+        {
+            clearTimeout(delay);
+        }
+        
+        delay = setTimeout(()=>func(),time);
+    }
+    
+    function divert(n){
+        
+        if(localStorage.getItem("localnew")===null)
+        {
+            localStorage.setItem("localnew",JSON.stringify([]));
+        }
+        console.log(n);
+
+        let news = JSON.parse(localStorage.getItem("localnew"));
+        
+        if(news.length > 0)
+        {
+           news.shift();
+        }
+        news.push(n);
+        localStorage.setItem("localnew",JSON.stringify(news));
+
+       window.location.href = "news.html";
+    }
+    function searchresults(p)
+    {
+        if(localStorage.getItem("results")===null)
+        {
+            localStorage.setItem("results",JSON.stringify([]));
+        }
+        console.log(p);
+
+        let searesult = JSON.parse(localStorage.getItem("results"));
+        
+        if(searesult.length > 0)
+        {
+            searesult.shift();
+        }
+        searesult.push(p);
+        localStorage.setItem("results",JSON.stringify(searesult));
+
+       window.location.href = "search.html";
+    }
+</script>
