@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body{
+        font-family: 'Lato', sans-serif;
+    }
+</style>
+<body>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+    <div id="container"></div>
+</body>
+</html>
+<script>
+    let news = JSON.parse(localStorage.getItem("localnew"))[0];
+
+    console.log(news);
+
+    let heading = document.createElement("h1");
+
+    heading.innerText = news.title;
+
+    let author = document.createElement('h5');
+    author.innerText = news.author;
+    let date = document.createElement('p');
+    date.innerText = news.publishedAt.split('T').join(' ');
+
+    let image = document.createElement('img');
+
+    image.src = news.urlToImage;
+
+    let content = document.createElement('p');
+
+    content.innerText = news.content;
+
+    let container = document.getElementById("container");
+
+    container.append(heading,author,date,image,content);
+
+</script>
